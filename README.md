@@ -1,0 +1,1 @@
+Just run the main() method of Main class, input 2 numbers from 1 to 10 (for producer and consumer count) and it will start to print the current queue size.
