@@ -12,4 +12,4 @@ Furthermore, there is a `MonitoringRunnable` that simply prints the current size
 
 <h2> How to Run </h2>
 
-Just run the main() method of Main class, input 2 numbers from 1 to 10 (for producer and consumer count) and it will start to print the current queue size.
+Just run the main() method of the Main class, input 2 numbers from 1 to 10 (for producer and consumer count) and it will start to print the current queue size.

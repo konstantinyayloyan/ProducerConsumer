@@ -44,18 +44,21 @@ public class LargeStringProducer implements Producer {
     public void produce() {
         try {
             lock.lock();
-
-            while (queue.size() >= QUEUE_MAX_SIZE) {
-                try {
-                    sizeLessThan80.await();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
+            waitForQueueSpace();
             addRandomStringToQueue();
             sizeIs0.signalAll();
         } finally {
             lock.unlock();
+        }
+    }
+
+    private void waitForQueueSpace() {
+        while (queue.size() >= QUEUE_MAX_SIZE) {
+            try {
+                sizeLessThan80.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 

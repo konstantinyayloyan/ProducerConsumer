@@ -33,15 +33,17 @@ public class Main {
 
         final ExecutorService producerExecutor = Executors.newFixedThreadPool(numProducers);
         final ExecutorService consumerExecutor = Executors.newFixedThreadPool(numConsumers);
+        final ExecutorService monitoringExecutor = Executors.newSingleThreadExecutor();
+
         final RandomStringGenerator randomGenerator = new ConcurrentRandomStringGenerator(NUMBER_OF_THREADS_FOR_STRING_GENERATION);
 
         startProducers(numProducers, queue, lock, sizeLessThan80, sizeIs0, producerExecutor, randomGenerator);
         startConsumers(numConsumers, queue, lock, sizeLessThan80, sizeIs0, consumerExecutor);
-        startMonitoring(queue);
+        startMonitoring(monitoringExecutor, queue);
     }
 
-    private static void startMonitoring(Queue<String> queue) {
-        new Thread(new MonitoringRunnable(queue)).start();
+    private static void startMonitoring(ExecutorService monitoringExecutor, Queue<String> queue) {
+        monitoringExecutor.submit(new MonitoringRunnable(queue));
     }
 
     private static void startConsumers(int numConsumers, Queue<String> queue, Lock lock, Condition sizeLessThan80, Condition sizeIs0, ExecutorService consumerExecutor) {
