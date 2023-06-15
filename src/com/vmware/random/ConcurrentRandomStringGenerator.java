@@ -36,29 +36,12 @@ public class ConcurrentRandomStringGenerator implements RandomStringGenerator {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         List<Callable<String>> tasks = new ArrayList<>();
 
-        final StringBuilder sb = new StringBuilder(totalSize);
-
         addTasks(totalSize, tasks);
+
+        final StringBuilder sb = new StringBuilder(totalSize);
         mergeResultsOfAllTasks(executorService, tasks, sb);
 
         return sb.toString();
-    }
-
-    private static void mergeResultsOfAllTasks(ExecutorService executorService, List<Callable<String>> tasks, StringBuilder sb) {
-        try {
-            final List<Future<String>> futures = executorService.invokeAll(tasks);
-            for (Future<String> future : futures) {
-                sb.append(future.get(5, TimeUnit.SECONDS));
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            System.out.println("Execution exception occurred");
-        } catch (TimeoutException e) {
-            System.out.println("Timeout exception occurred, please check generateRandomStringBatch() method because it took >5 seconds");
-        } finally {
-            executorService.shutdown();
-        }
     }
 
     /**
@@ -83,6 +66,23 @@ public class ConcurrentRandomStringGenerator implements RandomStringGenerator {
         for (int i = 0; i < numberOfThreads; ++i) {
             int batchSizeForThread = batchSize + (i < remainingSize ? 1 : 0);
             tasks.add(() -> generateRandomStringBatch(batchSizeForThread));
+        }
+    }
+
+    private static void mergeResultsOfAllTasks(ExecutorService executorService, List<Callable<String>> tasks, StringBuilder sb) {
+        try {
+            final List<Future<String>> futures = executorService.invokeAll(tasks);
+            for (Future<String> future : futures) {
+                sb.append(future.get(5, TimeUnit.SECONDS));
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            System.out.println("Execution exception occurred");
+        } catch (TimeoutException e) {
+            System.out.println("Timeout exception occurred, please check generateRandomStringBatch() method because it took >5 seconds");
+        } finally {
+            executorService.shutdown();
         }
     }
 
