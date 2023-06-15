@@ -31,4 +31,4 @@ bin/
 output.txt
 
 .idea/
-VMWareProducerConsumer.iml
+*.iml
